@@ -1,0 +1,11 @@
+.gradle
+build
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+.gradletasknamecache
+.project
+.classpath
+
+*.code-workspace
+lib/

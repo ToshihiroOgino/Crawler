@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 class VisitedResourceTest {
     @Test
     void testVisitedResource() {
+
         VisitedResource.register("https://www.example.com", "example.com");
         String filePath = VisitedResource.getFilePath("https://www.example.com");
         assertNotNull(filePath);

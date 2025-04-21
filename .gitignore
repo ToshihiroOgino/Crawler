@@ -9,3 +9,5 @@ gradle-app.setting
 
 *.code-workspace
 lib/
+
+**/*.class

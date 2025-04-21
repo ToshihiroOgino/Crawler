@@ -2,8 +2,12 @@ package org.crawler;
 
 import java.io.IOException;
 import static java.lang.Thread.sleep;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +17,8 @@ import org.jsoup.select.Elements;
 public class Crawler {
     private final int maxDepth;
     private final ExecutorService executor = Executors.newFixedThreadPool(32);
+    // 追加
+    private final List<Future<?>> futures = new ArrayList<>();
 
     public Crawler(final int maxDepth) {
         this.maxDepth = maxDepth;
@@ -38,7 +44,8 @@ public class Crawler {
             String path = VisitedResource.getFilePath(linkURL);
             if (path == null) {
                 // crawl(linkURL, currentDepth + 1);
-                executor.submit(() -> crawl(linkURL, currentDepth + 1));
+                var fut = executor.submit(() -> crawl(linkURL, currentDepth + 1));
+                futures.add(fut);
                 path = FileUtil.generateHTMLFilePath(linkURL);
             }
             link.attr("href", path);
@@ -72,6 +79,14 @@ public class Crawler {
     }
 
     public void shutdown() {
+        for (var fut : futures) {
+            try {
+                fut.get();
+            } catch (InterruptedException | ExecutionException e) {
+                System.err.println("Error waiting for future: " + e.getMessage());
+            }
+        }
+
         executor.shutdown();
         while (!executor.isTerminated()) {
             try {

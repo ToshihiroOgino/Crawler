@@ -26,9 +26,29 @@ public class Crawler {
 
     private Document fetchDocument(final String url) {
         try {
-            return Jsoup.connect(url).timeout(5 * 1000).get();
+            if (url.equals("https://www.rakuten.co.jp/"))
+                return Jsoup
+                        .connect(url)
+                        .header("User-Agent",
+                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
+                        .header("Accept", "*/*")
+                        .header("Accept-Language", "ja;q=0.6")
+                        .header("Accept-Encoding", "gzip, deflate, br")
+                        .header("Priority", "u=0, i")
+                        .header("Cache-Control", "max-age=0")
+                        .header("Sec-Fetch-Dest", "document")
+                        .header("Sec-Fetch-Mode", "navigate")
+                        .header("Sec-Fetch-Site", "none")
+                        .header("Sec-Fetch-User", "?1")
+                        .header("Upgrade-Insecure-Requests", "1")
+                        .header("Pragma", "no-cache")
+                        .header("Expires", "0")
+                        .timeout(3 * 1000).get();
+            else
+                return Jsoup.connect(url).timeout(3 * 1000).get();
         } catch (IOException e) {
             System.err.println("Error fetching " + url);
+            System.err.println(e.getMessage());
             return null;
         }
     }

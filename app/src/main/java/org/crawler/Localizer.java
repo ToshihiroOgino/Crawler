@@ -16,22 +16,19 @@ public class Localizer {
         }
 
         try {
-            Response res = Jsoup.connect(srcURL).timeout(5 * 1000).ignoreContentType(true).execute();
+            Response res = Jsoup.connect(srcURL).timeout(3 * 1000).ignoreContentType(true).execute();
             final String contentType = res.contentType();
-            final String filePath = FileUtil.generateFilePath(srcURL, contentType);
-            FileUtil.saveToFile(res.bodyAsBytes(), filePath);
-            VisitedResource.register(srcURL, filePath);
-            return filePath;
+            path = FileUtil.generateFilePath(srcURL, contentType);
+            VisitedResource.register(srcURL, path);
+            FileUtil.saveToFile(res.bodyAsBytes(), path);
         } catch (IOException e) {
             System.err.println("Error fetching " + srcURL);
         }
-        return srcURL;
+        return path;
     }
 
     public static void localize(Document doc) {
-        Elements depFiles = doc.select("img, link[rel=stylesheet], script, source");
-
-        for (Element element : depFiles) {
+        for (Element element : doc.getAllElements()) {
             final String tag = element.tag().getName();
             String srcURL;
             String attrName;
@@ -50,7 +47,7 @@ public class Localizer {
                 }
             }
 
-            if (srcURL.startsWith("data:") || srcURL.equals("")) {
+            if (!(srcURL.startsWith("https:") || srcURL.startsWith("http:"))) {
                 continue;
             }
 
